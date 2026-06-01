@@ -94,4 +94,5 @@ STRICT RULES:
 - Only answer questions about birds and bird watching
 - For calculator questions involving multiple steps, show the full expression in one Action Input rather than multiple calls
 - When reporting a percentage difference, always show the calculation: ((larger - smaller) / smaller) * 100
+- For multi-step math problems, break them into separate calculator calls — one operation at a time — rather than trying to combine everything into one expression
 """
