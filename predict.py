@@ -4,7 +4,8 @@
 # Analogy: a detective who keeps investigating — gathering clues (tool results),
 # reasoning about them, and only closing the case when they have a complete answer
 
-import re                          # for parsing the LLM's output with pattern matching
+import re                       # for parsing the LLM's output with pattern matching
+import time
 from groq import Groq              # the Groq client for calling the LLM
 import config                      # imports settings, system prompt, and tool definitions
 import features                    # imports the tool registry
@@ -104,6 +105,7 @@ def run_agent(question: str, verbose: bool = True) -> dict:
     for iteration in range(config.MAX_ITERATIONS):           # loops up to MAX_ITERATIONS times
 
         # ── Step 1: call the LLM ───────────────────────────────────────────────
+        time.sleep(0.5)
         response = client.chat.completions.create(           # sends the message history to Groq
             model=config.MODEL_NAME,                         # the model specified in config
             messages=messages,                               # full conversation history
@@ -150,7 +152,7 @@ def run_agent(question: str, verbose: bool = True) -> dict:
             # so the LLM has full context on its next iteration
             messages.append({"role": "assistant", "content": llm_output})      # LLM's reasoning
             # truncate long observations before adding to history to avoid hitting token limits
-            truncated = observation[:2000] if len(observation) > 2000 else observation  # keeps history manageable
+            truncated = observation[:1000] if len(observation) > 1000 else observation  # keeps history manageable
             messages.append({"role": "user", "content": f"Observation: {truncated}"})  # tool result
 
             steps.append({                                   # log this step
