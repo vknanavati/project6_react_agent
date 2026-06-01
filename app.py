@@ -5,8 +5,7 @@
 
 from flask import Flask, request, jsonify  # Flask for the web server, request for reading input, jsonify for JSON responses
 import config                              # imports settings including the Flask port
-import predict
-import threading                              # allows Flask to run in a background thread                             # imports the run_agent function
+import predict                             # imports the run_agent function
 
 # ── Initialize Flask ───────────────────────────────────────────────────────────
 
@@ -84,35 +83,12 @@ def tools():
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print(f"\n🐦 {config.AGENT_NAME} — Backyard Bird Assistant")
+    print(f"\n🐦 {config.AGENT_NAME} — Backyard Bird ReAct Agent")
     print(f"   Model   : {config.MODEL_NAME}")
     print(f"   Tools   : {', '.join(predict.features.TOOL_REGISTRY.keys())}")
-    print(f"   API     : http://127.0.0.1:{config.FLASK_PORT}")
-    print(f"   Ask me anything about birds and bird watching.")
-    print(f"   Type 'quit' to exit.\n")
-
-    # start Flask in a background thread so it doesn't block the interactive prompt
-    flask_thread = threading.Thread(                         # creates a background thread for Flask
-        target=lambda: app.run(                              # runs the Flask server in the thread
-            host="0.0.0.0",
-            port=config.FLASK_PORT,
-            debug=False,                                     # debug must be False when using threads
-            use_reloader=False                               # reloader must be off when using threads
-        )
+    print(f"   Running on http://127.0.0.1:{config.FLASK_PORT}\n")
+    app.run(                                                 # starts the Flask development server
+        host="0.0.0.0",                                     # accepts connections from any network interface
+        port=config.FLASK_PORT,                              # uses port 5003 from config
+        debug=config.FLASK_DEBUG                            # debug mode off
     )
-    flask_thread.daemon = True                               # thread dies when main program exits
-    flask_thread.start()                                     # starts the Flask thread in the background
-
-    # interactive prompt runs in the main thread
-    while True:                                              # keeps the prompt running until user quits
-        question = input("Ask a question: ").strip()         # displays the prompt and waits for input
-
-        if not question:                                     # skips empty input
-            continue
-
-        if question.lower() == "quit":                       # exits if user types quit
-            print("\nHappy birding! 🐦\n")
-            break
-
-        result = predict.run_agent(question, verbose=True)   # runs the ReAct loop
-        print("\n" + "═" * 60 + "\n")                       # prints a separator between questions

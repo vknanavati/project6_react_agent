@@ -184,19 +184,14 @@ def run_agent(question: str, verbose: bool = True) -> dict:
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("\n🐦 Birdie — Backyard Bird Assistant")
-    print("   Ask me anything about birds and bird watching.")
-    print("   Type 'quit' to exit.\n")
+    # test the agent with a few bird questions
+    test_questions = [
+        "What do American Robins eat?",
+        "Is it good weather for bird watching in Hartford, CT today?",
+        "What does the term altricial mean?",
+        "A chickadee weighs 11 grams and a blue jay weighs 85 grams. How many times heavier is the blue jay?",
+    ]
 
-    while True:                                              # keeps the prompt running until user quits
-        question = input("Ask a question: ").strip()         # displays the prompt and waits for input
-
-        if not question:                                     # skips empty input
-            continue
-
-        if question.lower() == "quit":                       # exits the loop if user types quit
-            print("\nHappy birding! 🐦\n")
-            break
-
-        result = run_agent(question, verbose=True)           # runs the ReAct loop
+    for question in test_questions:                          # loops through each test question
+        result = run_agent(question, verbose=True)           # runs the full ReAct loop
         print("\n" + "═" * 60 + "\n")                       # prints a separator between questions
