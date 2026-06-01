@@ -71,8 +71,16 @@ def get_weather(city: str) -> str:
         )
         geo_data = geo_response.json()                       # parses the JSON response into a dict
 
-        if not geo_data.get("results"):                      # checks if any location was found
-            return f"Could not find location: '{city}'"
+        if not geo_data.get("results"):                      # first attempt failed, try without state abbreviation
+            city_only = city.split(",")[0].strip()           # strips ", CT" or ", PA" from the city name
+            geo_response = requests.get(                     # retries the geocoding API with just the city name
+                config.GEOCODING_API_URL,
+                params={"name": city_only, "count": 1, "language": "en", "format": "json"},
+                timeout=10
+            )
+            geo_data = geo_response.json()                   # parses the retry response
+            if not geo_data.get("results"):                  # if still nothing, give up
+                return f"Could not find location: '{city}'"
 
         location = geo_data["results"][0]                    # takes the first (best) result
         lat = location["latitude"]                           # extracts latitude
