@@ -99,18 +99,3 @@ project6_react_agent/
 | Encyclopedia | Wikipedia MediaWiki API |
 | Web API | Flask on port 5003 |
 | Language | Python 3.12.9 |
-
----
-
-## Curriculum Progress
-
-| Project | Topic | Status |
-|---|---|---|
-| 0 | Image Classification | ✅ Done |
-| 1 | Binary Classification | ✅ Done |
-| 2 | Sentiment Analysis | ✅ Done |
-| 3 | Regression | ✅ Done |
-| 4 | Text Generation | ✅ Done |
-| 5 | RAG | ✅ Done |
-| 6 | ReAct Agent | ✅ Done |
-| 7 | Agentic RAG | ⬜ Next |
