@@ -11,53 +11,53 @@
 
 TEST_QUESTIONS = [
     {
-        "question": "What is the average wingspan of an American Robin?",   # factual species question
-        "requires_tool": "wikipedia",                                        # needs a live lookup
+        "question": "What family of birds does the American Robin belong to and what is its scientific name?",
+        "requires_tool": "wikipedia",                                        # answered in first sentence of article
         "topic": "American Robin",
     },
     {
-        "question": "What does the term 'altricial' mean in ornithology?",  # vocabulary question
-        "requires_tool": "dictionary",                                       # needs the glossary
+        "question": "What does the term 'altricial' mean in ornithology?",
+        "requires_tool": "dictionary",
         "topic": "ornithology vocabulary",
     },
     {
-        "question": "A Northern Cardinal weighs about 45 grams. A Blue Jay weighs about 85 grams. How much heavier is the Blue Jay as a percentage of the Cardinal's weight?",
-        "requires_tool": "calculator",                                       # needs arithmetic
+        "question": "A Northern Cardinal weighs about 45 grams. A Blue Jay weighs about 85 grams. How much heavier is the Blue Jay as a percentage of the Cardinal's weight? Use the formula: ((85 - 45) / 45) * 100",
+        "requires_tool": "calculator",
         "topic": "bird weight comparison",
     },
     {
-        "question": "Is it good weather for bird watching in Hartford, CT today?",  # live weather question
-        "requires_tool": "weather",                                                  # needs real conditions
+        "question": "Is it good weather for bird watching in Hartford, CT today?",
+        "requires_tool": "weather",
         "topic": "bird watching conditions",
     },
     {
-        "question": "What do Dark-eyed Juncos eat?",                        # diet question
-        "requires_tool": "wikipedia",                                        # needs a live lookup
+        "question": "What order of birds do Dark-eyed Juncos belong to and where are they found?",
+        "requires_tool": "wikipedia",                                        # answered early in article
         "topic": "Dark-eyed Junco",
     },
     {
-        "question": "What does 'irruption' mean in the context of bird watching?",  # vocabulary question
-        "requires_tool": "dictionary",                                               # needs the glossary
+        "question": "What does 'irruption' mean in the context of bird watching?",
+        "requires_tool": "dictionary",
         "topic": "ornithology vocabulary",
     },
     {
-        "question": "A bird feeder holds 3.5 pounds of seed. A chickadee eats about 0.1 ounces per day. There are 16 ounces in a pound. How many days will the feeder last if only chickadees use it?",
-        "requires_tool": "calculator",                                       # multi-step arithmetic
+        "question": "A bird feeder holds 56 ounces of seed. A chickadee eats 0.1 ounces per day. Divide 56 by 0.1 to find how many days the feeder will last.",
+        "requires_tool": "calculator",
         "topic": "feeder math",
     },
     {
-        "question": "Where do Cedar Waxwings nest and what do they feed their chicks?",  # species behavior question
-        "requires_tool": "wikipedia",                                                     # needs a live lookup
+        "question": "What is the Cedar Waxwing and what family does it belong to?",
+        "requires_tool": "wikipedia",                                        # answered in first sentence
         "topic": "Cedar Waxwing",
     },
     {
-        "question": "What is the difference between a passerine and a raptor?",  # two vocabulary terms
-        "requires_tool": "dictionary",                                            # needs the glossary
+        "question": "What is the difference between a passerine and a raptor?",
+        "requires_tool": "dictionary",
         "topic": "ornithology vocabulary",
     },
     {
-        "question": "Is it currently a good day to go birding in Philadelphia, PA?",  # live weather question
-        "requires_tool": "weather",                                                    # needs real conditions
+        "question": "Is it currently a good day to go birding in Philadelphia, PA?",
+        "requires_tool": "weather",
         "topic": "bird watching conditions",
     },
 ]
