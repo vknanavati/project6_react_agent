@@ -3,7 +3,7 @@
 # Analogy: if config.py is the menu, this is the kitchen — the place where the actual work gets done
 
 import math          # provides mathematical functions like sqrt, floor, etc.
-import wikipedia     # Python library for fetching Wikipedia summaries
+# import wikipedia     # Python library for fetching Wikipedia summaries
 import requests      # for making HTTP calls to the Open-Meteo weather API
 import config        # imports our central settings (API URLs, etc.)
 
@@ -30,29 +30,32 @@ def wikipedia_search(query: str) -> str:
     """
     Fetches a Wikipedia summary for a bird species or ornithology topic.
 
-    Plain explanation: searches Wikipedia for the query and returns the first
+    Plain explanation: calls Wikipedia's API directly and returns the first
     few sentences of the article.
     Analogy: sending an intern to the library to look up a topic and come back
     with a short summary — not the whole book, just the key facts.
     """
     try:
-        wikipedia.set_lang("en")                             # sets language to English
-        summary = wikipedia.summary(query, sentences=4)      # fetches the first 4 sentences
-        return summary                                        # returns the summary string
-    except wikipedia.exceptions.DisambiguationError as e:    # fires when query matches multiple articles
-        # try the first suggested option automatically
-        try:
-            summary = wikipedia.summary(e.options[0], sentences=4)  # retries with first suggestion
-            return summary                                            # returns the fallback summary
-        except Exception:
-            return f"Wikipedia disambiguation error for '{query}'. Try a more specific term."
-    except wikipedia.exceptions.PageError:                   # fires when no article is found
-        return f"No Wikipedia article found for '{query}'."
-    except Exception as e:                                   # catches any other unexpected errors
+        response = requests.get(                             # calls Wikipedia's REST API directly
+            "https://en.wikipedia.org/api/rest_v1/page/summary/" + query.replace(" ", "_"),
+            headers={"User-Agent": "BirdAgent/1.0"},         # required by Wikipedia's API terms
+            timeout=10                                        # gives up after 10 seconds
+        )
+        if response.status_code != 200:                      # checks if the request succeeded
+            return f"No Wikipedia article found for '{query}'."
+        data = response.json()                               # parses the JSON response
+        extract = data.get("extract", "")                    # gets the article summary text
+        if not extract:                                      # checks if summary is empty
+            return f"No Wikipedia summary available for '{query}'."
+        sentences = extract.split(". ")                      # splits into sentences
+        summary = ". ".join(sentences[:4])                   # takes the first 4 sentences
+        if not summaryd.endswith("."):                        # adds a period if missing
+            summary += "."
+        return summary                                        # returns the cleaned summary
+    except Exception as e:                                   # catches any network or parsing errors
         return f"Wikipedia error: {str(e)}"
 
 # ── Weather ────────────────────────────────────────────────────────────────────
-
 def get_weather(city: str) -> str:
     """
     Returns current weather conditions for a given city using the Open-Meteo API.
@@ -63,29 +66,21 @@ def get_weather(city: str) -> str:
     find where their city is on a map, then check what the sky looks like there.
     """
     try:
-        # Step 1: convert city name to latitude and longitude
-        geo_response = requests.get(                         # makes a GET request to the geocoding API
-            config.GEOCODING_API_URL,
-            params={"name": city, "count": 1, "language": "en", "format": "json"},
-            timeout=10                                       # gives up after 10 seconds if no response
+        # Step 1: convert city name to coordinates using Nominatim (OpenStreetMap)
+        geo_response = requests.get(                         # calls Nominatim geocoding API
+            "https://nominatim.openstreetmap.org/search",
+            params={"q": city, "format": "json", "limit": 1},  # q accepts any city name or address
+            headers={"User-Agent": "BirdAgent/1.0"},         # required by Nominatim's terms of use
+            timeout=10                                        # gives up after 10 seconds
         )
-        geo_data = geo_response.json()                       # parses the JSON response into a dict
+        geo_data = geo_response.json()                       # parses the JSON response into a list
 
-        if not geo_data.get("results"):                      # first attempt failed, try without state abbreviation
-            city_only = city.split(",")[0].strip()           # strips ", CT" or ", PA" from the city name
-            geo_response = requests.get(                     # retries the geocoding API with just the city name
-                config.GEOCODING_API_URL,
-                params={"name": city_only, "count": 1, "language": "en", "format": "json"},
-                timeout=10
-            )
-            geo_data = geo_response.json()                   # parses the retry response
-            if not geo_data.get("results"):                  # if still nothing, give up
-                return f"Could not find location: '{city}'"
+        if not geo_data:                                     # checks if any location was found
+            return f"Could not find location: '{city}'"
 
-        location = geo_data["results"][0]                    # takes the first (best) result
-        lat = location["latitude"]                           # extracts latitude
-        lon = location["longitude"]                          # extracts longitude
-        location_name = location["name"]                     # extracts the resolved city name
+        lat = float(geo_data[0]["lat"])                      # extracts latitude as a float
+        lon = float(geo_data[0]["lon"])                      # extracts longitude as a float
+        location_name = geo_data[0]["display_name"]          # extracts the full resolved place name                   # extracts the resolved city name
 
         # Step 2: fetch current weather using coordinates
         weather_response = requests.get(                     # makes a GET request to the weather API
