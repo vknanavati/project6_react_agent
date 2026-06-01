@@ -19,7 +19,7 @@ def calculator(expression: str) -> str:
     try:
         # eval() executes the expression string as Python code
         # we pass math as a safe namespace so the LLM can use functions like math.sqrt()
-        result = eval(expression, {"__builtins__": {}}, {"math": math})
+        result = eval(expression, {"__builtins__": {}}, {"math": math, "round": round})
         return f"{result}"                           # returns the result as a plain string
     except Exception as e:                           # catches any invalid expression errors
         return f"Calculator error: {str(e)}"         # returns a readable error instead of crashing
@@ -48,7 +48,7 @@ def wikipedia_search(query: str) -> str:
         if not extract:                                      # checks if summary is empty
             return f"No Wikipedia summary available for '{query}'."
         sentences = extract.split(". ")                      # splits into sentences
-        summary = ". ".join(sentences[:4])                   # takes the first 4 sentences
+        summary = ". ".join(sentences[:8])                   # takes the first 4 sentences
         if not summary.endswith("."):                        # adds a period if missing
             summary += "."
         return summary                                        # returns the cleaned summary
