@@ -49,7 +49,7 @@ def wikipedia_search(query: str) -> str:
             return f"No Wikipedia summary available for '{query}'."
         sentences = extract.split(". ")                      # splits into sentences
         summary = ". ".join(sentences[:4])                   # takes the first 4 sentences
-        if not summaryd.endswith("."):                        # adds a period if missing
+        if not summary.endswith("."):                        # adds a period if missing
             summary += "."
         return summary                                        # returns the cleaned summary
     except Exception as e:                                   # catches any network or parsing errors
