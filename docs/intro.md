@@ -90,6 +90,39 @@ project6_react_agent/
 
 ---
 
+## What the Agent Actually Is
+
+The word "agent" can be misleading — it sounds like a single thing. It's actually a system of components working together. Here's exactly what comprises the Backyard Bird ReAct Agent:
+
+### 1. The LLM — the brain
+`llama-3.1-8b-instant` running on Groq's API. This is the component that reads the conversation and decides what to do next — which tool to call, what input to pass, and when it has enough information to give a final answer. The LLM has no awareness that it's inside a loop. It just receives a block of text and writes a response in the format we instructed.
+
+### 2. The prompt — the job description
+The system prompt in `config.py` is what turns a general-purpose LLM into a bird watching assistant that uses tools. Without it, the LLM would just answer from memory like any chatbot. The prompt tells it who it is, what tools it has, exactly how to format its output, and what rules to follow. The quality of the agent is directly tied to the quality of the prompt.
+
+### 3. The tools — the hands
+The four Python functions in `features.py` — calculator, wikipedia, weather, dictionary. The LLM cannot call these directly. It only writes text describing which tool it wants to use. Our code reads that text and calls the actual function.
+
+### 4. The tool registry — the switchboard
+The `TOOL_REGISTRY` dictionary in `features.py` maps tool name strings to their Python functions. When the agent loop sees `Action: weather` in the LLM's output, it looks up `"weather"` in the registry and calls `get_weather()`. This is the bridge between the LLM's text world and real Python code.
+
+### 5. The parser — the interpreter
+`parse_llm_output()` in `predict.py` reads the LLM's raw text response and extracts the structured fields — Thought, Action, Action Input, and Final Answer — using pattern matching. If the LLM drifts from the required format, the parser fails and the loop stops.
+
+### 6. The ReAct loop — the conductor
+`run_agent()` in `predict.py` is what makes this an agent rather than a single API call. It manages the conversation history, calls the LLM, passes output to the parser, calls the right tool, feeds the result back, and repeats until a Final Answer is produced or MAX_ITERATIONS is hit. None of the other components know about the loop — it orchestrates all of them.
+
+### 7. The message history — the memory
+A Python list of messages that grows with each iteration. Every LLM call receives the entire history so the model can see its previous reasoning and all tool results. This is the agent's only form of memory — it exists only for the duration of one question and resets completely for the next.
+
+---
+
+### The key insight
+
+The LLM and the agent are not the same thing. The LLM is one component — the reasoning engine. The agent is the system built around it. Swapping to a larger, more capable LLM would improve answer quality without changing a single line of code in the agent itself, because the structure and the intelligence are separate concerns.
+
+---
+
 ## Stack
 
 - **Python 3.12.9**
