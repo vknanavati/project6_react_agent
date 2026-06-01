@@ -149,7 +149,9 @@ def run_agent(question: str, verbose: bool = True) -> dict:
             # we add the LLM's output and the tool result to the conversation
             # so the LLM has full context on its next iteration
             messages.append({"role": "assistant", "content": llm_output})      # LLM's reasoning
-            messages.append({"role": "user", "content": f"Observation: {observation}"})  # tool result
+            # truncate long observations before adding to history to avoid hitting token limits
+            truncated = observation[:500] if len(observation) > 500 else observation  # keeps history manageable
+            messages.append({"role": "user", "content": f"Observation: {truncated}"})  # tool result
 
             steps.append({                                   # log this step
                 "iteration": iteration + 1,
