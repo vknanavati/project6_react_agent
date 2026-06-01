@@ -78,7 +78,7 @@ def wikipedia_search(query: str) -> str:
             return f"No content found for '{query}'."
 
         # Step 3: return the first 1500 characters — enough to cover diet, habitat, behavior
-        return f"Wikipedia article: {title}\n\n{extract[:1500]}"
+        return f"Wikipedia article: {title}\n\n{extract[:4000]}"
 
     except Exception as e:                                   # catches any network or parsing errors
         return f"Wikipedia error: {str(e)}"
