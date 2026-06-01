@@ -41,7 +41,7 @@ TEST_QUESTIONS = [
         "topic": "ornithology vocabulary",
     },
     {
-        "question": "A bird feeder holds 3.5 pounds of seed. A chickadee eats about 0.1 ounces per day. There are 16 ounces in a pound. First convert 3.5 pounds to ounces by multiplying by 16, then divide that result by 0.1 to get the number of days.",
+        "question": "A bird feeder holds 3.5 pounds of seed. A chickadee eats about 0.1 ounces per day. There are 16 ounces in a pound. How many days will the feeder last if only chickadees use it?",
         "requires_tool": "calculator",                                       # multi-step arithmetic
         "topic": "feeder math",
     },
