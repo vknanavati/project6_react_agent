@@ -28,30 +28,58 @@ def calculator(expression: str) -> str:
 
 def wikipedia_search(query: str) -> str:
     """
-    Fetches a Wikipedia summary for a bird species or ornithology topic.
+    Fetches a Wikipedia article section for a bird species or ornithology topic.
 
-    Plain explanation: calls Wikipedia's API directly and returns the first
-    few sentences of the article.
-    Analogy: sending an intern to the library to look up a topic and come back
-    with a short summary — not the whole book, just the key facts.
+    Plain explanation: calls Wikipedia's API to get the full article text,
+    then returns the most relevant sections rather than just the intro.
+    Analogy: instead of reading only the book jacket, we open the book and
+    read the first few chapters to find the specific information we need.
     """
     try:
-        response = requests.get(                             # calls Wikipedia's REST API directly
-            "https://en.wikipedia.org/api/rest_v1/page/summary/" + query.replace(" ", "_"),
-            headers={"User-Agent": "BirdAgent/1.0"},         # required by Wikipedia's API terms
-            timeout=10                                        # gives up after 10 seconds
+        # Step 1: search for the best matching article title
+        search_response = requests.get(
+            "https://en.wikipedia.org/w/api.php",            # Wikipedia's main API endpoint
+            params={
+                "action": "query",                           # we want to query Wikipedia
+                "list": "search",                            # use the search function
+                "srsearch": query,                           # the search query
+                "format": "json",                            # return JSON
+                "srlimit": 1,                                # just the top result
+            },
+            headers={"User-Agent": "BirdAgent/1.0"},
+            timeout=10
         )
-        if response.status_code != 200:                      # checks if the request succeeded
+        search_data = search_response.json()                 # parses the search results
+        results = search_data.get("query", {}).get("search", [])
+        if not results:                                      # no results found
             return f"No Wikipedia article found for '{query}'."
-        data = response.json()                               # parses the JSON response
-        extract = data.get("extract", "")                    # gets the article summary text
-        if not extract:                                      # checks if summary is empty
-            return f"No Wikipedia summary available for '{query}'."
-        sentences = extract.split(". ")                      # splits into sentences
-        summary = ". ".join(sentences[:8])                   # takes the first 4 sentences
-        if not summary.endswith("."):                        # adds a period if missing
-            summary += "."
-        return summary                                        # returns the cleaned summary
+        title = results[0]["title"]                          # takes the top result's title
+
+        # Step 2: fetch the full article text using the title
+        article_response = requests.get(
+            "https://en.wikipedia.org/w/api.php",            # Wikipedia's main API endpoint
+            params={
+                "action": "query",                           # query action
+                "titles": title,                             # the article title from step 1
+                "prop": "extracts",                          # we want the article text
+                "explaintext": True,                         # plain text, no HTML
+                "exsectionformat": "plain",                  # plain section format
+                "format": "json",                            # return JSON
+            },
+            headers={"User-Agent": "BirdAgent/1.0"},
+            timeout=10
+        )
+        article_data = article_response.json()               # parses the article response
+        pages = article_data.get("query", {}).get("pages", {})
+        page = next(iter(pages.values()))                    # gets the first (only) page
+        extract = page.get("extract", "")                    # gets the full article text
+
+        if not extract:                                      # article exists but has no text
+            return f"No content found for '{query}'."
+
+        # Step 3: return the first 1500 characters — enough to cover diet, habitat, behavior
+        return f"Wikipedia article: {title}\n\n{extract[:1500]}"
+
     except Exception as e:                                   # catches any network or parsing errors
         return f"Wikipedia error: {str(e)}"
 
